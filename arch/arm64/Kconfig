@@ -915,3 +915,10 @@ endif
 source "lib/Kconfig"
 
 source "arch/arm64/mm/Kconfig"
+
+source "arch/arm64/hotplug/Kconfig"
+
+config PROJECT_GARLIC
+	tristate "project support"
+	help
+	  This option enables support project name
