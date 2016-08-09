@@ -117,6 +117,8 @@
 
 			qcom,speed-bin = <0>;
 
+			qcom,initial-pwrlevel = <6>;
+
 			qcom,gpu-pwrlevel@0 {
 				reg = <0>;
 				qcom,gpu-freq = <624000000>;
