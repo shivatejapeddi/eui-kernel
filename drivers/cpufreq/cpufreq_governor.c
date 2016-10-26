@@ -41,7 +41,7 @@ void dbs_check_cpu(struct dbs_data *dbs_data, int cpu)
 	struct cs_dbs_tuners *cs_tuners = dbs_data->tuners;
 	struct cpufreq_policy *policy;
 	unsigned int sampling_rate;
-	unsigned int max_load = 0;
+	unsigned int max_load = 0, deferred_periods = UINT_MAX;
 	unsigned int ignore_nice;
 	unsigned int j;
 
@@ -141,10 +141,12 @@ void dbs_check_cpu(struct dbs_data *dbs_data, int cpu)
 		 * - during long idle intervals
 		 * - explicitly set to zero
 		 */
-		if (unlikely(wall_time > (2 * sampling_rate) &&
-			     j_cdbs->prev_load)) {
-			load = j_cdbs->prev_load;
+		if (unlikely(wall_time > (2 * sampling_rate))) {
+			unsigned int busy = wall_time - idle_time;
+			unsigned int periods = wall_time / sampling_rate;
 
+			if (periods < deferred_periods)
+				deferred_periods = periods;
 			/*
 			 * Perform a destructive copy, to ensure that we copy
 			 * the previous load only once, upon the first wake-up
@@ -159,6 +161,7 @@ void dbs_check_cpu(struct dbs_data *dbs_data, int cpu)
 		if (load > max_load)
 			max_load = load;
 	}
+	cdbs->deferred_periods = deferred_periods;
 
 	dbs_data->cdata->gov_check_cpu(cpu, max_load);
 }
