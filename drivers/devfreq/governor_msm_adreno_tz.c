@@ -20,6 +20,7 @@
 #include <linux/ftrace.h>
 #include <linux/mm.h>
 #include <linux/msm_adreno_devfreq.h>
+#include <linux/display_state.h>
 #include <asm/cacheflush.h>
 #include <soc/qcom/scm.h>
 #include "governor.h"
@@ -196,6 +197,10 @@ void compute_work_load(struct devfreq_dev_status *stats,
 	spin_unlock(&sample_lock);
 }
 
+/* Display and suspend state booleans */ 
+static bool display_on;
+static bool suspended = false;
+
 /* Trap into the TrustZone, and call funcs there. */
 static int __secure_tz_reset_entry2(unsigned int *scm_data, u32 size_scm_data,
 					bool is_64)
@@ -366,6 +371,15 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 		return 0;
 	}
 #endif
+
+	/*
+	 * Force to use & record as min freq when system has
+	 * entered pm-suspend or screen-off state.
+	 */
+	if (suspended || !display_on) {
+		*freq = devfreq->profile->freq_table[devfreq->profile->max_state - 1];
+		return 0;
+	}
 
 	priv->bin.total_time += stats.total_time;
 #if 1
@@ -584,9 +598,12 @@ static int tz_suspend(struct devfreq *devfreq)
 	struct devfreq_msm_adreno_tz_data *priv = devfreq->data;
 	unsigned int scm_data[2] = {0, 0};
 	__secure_tz_reset_entry2(scm_data, sizeof(scm_data), priv->is_64);
+	display_on = is_display_on();
+	suspended = true;
 
 	priv->bin.total_time = 0;
 	priv->bin.busy_time = 0;
+
 	return 0;
 }
 
@@ -632,6 +649,8 @@ static int tz_handler(struct devfreq *devfreq, unsigned int event, void *data)
 		/* Reset the suspend_start when gpu resumes */
 		suspend_start = 0;
 		spin_unlock(&suspend_lock);
+		display_on = is_display_on();
+		suspended = false;
 
 	case DEVFREQ_GOV_INTERVAL:
 		/* ignored, this governor doesn't use polling */
