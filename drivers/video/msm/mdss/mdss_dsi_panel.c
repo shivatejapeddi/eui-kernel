@@ -22,7 +22,7 @@
 #include <linux/qpnp/pwm.h>
 #include <linux/err.h>
 #include <linux/string.h>
-
+#include <linux/display_state.h>
 #include "mdss_dsi.h"
 #include "mdss_dba_utils.h"
 
@@ -37,6 +37,21 @@
 #define VSYNC_DELAY msecs_to_jiffies(17)
 
 DEFINE_LED_TRIGGER(bl_led_trigger);
+
+int panel_rst_gpio = -1;
+bool panel_rst_high_flag = 0;
+
+#ifdef LCD_BIST_TEST
+struct dsi_panel_cmds bist_cmds;
+bool bist_cmds_on = false;
+#endif
+
+bool display_on = true;
+
+bool is_display_on()
+{
+	return display_on;
+}
 
 void mdss_dsi_panel_pwm_cfg(struct mdss_dsi_ctrl_pdata *ctrl)
 {
@@ -688,7 +703,9 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 #ifdef CONFIG_POWERSUSPEND
 	set_power_suspend_state_panel_hook(POWER_SUSPEND_INACTIVE);
 #endif
-	
+
+	display_on = true;
+
 	pinfo = &pdata->panel_info;
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
@@ -789,10 +806,12 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 		mdss_dba_utils_video_off(pinfo->dba_data);
 		mdss_dba_utils_hdcp_enable(pinfo->dba_data, false);
 	}
-    
+ 
 #ifdef CONFIG_POWERSUSPEND
 	set_power_suspend_state_panel_hook(POWER_SUSPEND_ACTIVE);
 #endif
+
+	display_on = false;
 
 end:
 	pr_debug("%s:-\n", __func__);
@@ -1346,6 +1365,41 @@ static int mdss_dsi_parse_reset_seq(struct device_node *np,
 
 static int mdss_dsi_gen_read_status(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 {
+	int ret = 0;
+	static int esd_err_count = 0;
+	if(true == ctrl_pdata->enable_reg_check1)
+	{
+		if (!mdss_dsi_cmp_panel_reg(ctrl_pdata->status_buf1,
+			ctrl_pdata->status_value1, 0)) {
+			pr_err("%s: Read status_buf1=%x,status_value1=%x value from panel is incorrect\n",
+								__func__,ctrl_pdata->status_buf1.data[0],ctrl_pdata->status_value1[0]);
+			 mdss_dsi_write_status1(ctrl_pdata);
+		}
+	}
+
+	if(true == ctrl_pdata->enable_reg_check2)
+	{
+		if (!mdss_dsi_cmp_panel_reg(ctrl_pdata->status_buf2,
+			ctrl_pdata->status_value2, 0)) {
+			pr_err("%s: Read status_buf2=%x,status_value2=%x value from panel is incorrect\n",
+								__func__,ctrl_pdata->status_buf2.data[0],ctrl_pdata->status_value2[0]);
+			if(!strcmp("mdss_dsi_ft8716_1080p_video",&ctrl_pdata->panel_data.panel_info.panel_name[0]))
+			{
+				esd_err_count++;
+				if(esd_err_count >= 3)
+				{
+					pr_err("%s: ft8716 esd 0xAC read error\n",__func__);
+					esd_err_count = 0;
+					return -EINVAL;
+				}
+                		}
+			else
+			{
+			 mdss_dsi_write_status2(ctrl_pdata);
+		}
+	}
+	}
+
 	if (!mdss_dsi_cmp_panel_reg(ctrl_pdata->status_buf,
 		ctrl_pdata->status_value, 0)) {
 		pr_err("%s: Read back value from panel is incorrect\n",
