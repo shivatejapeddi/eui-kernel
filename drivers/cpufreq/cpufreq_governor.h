@@ -192,6 +192,9 @@ struct cs_dbs_tuners {
 	unsigned int down_threshold;
 	unsigned int freq_step;
 	unsigned int touch_load_duration;
+	unsigned int sleep_depth;
+	unsigned int boost_enabled;
+	unsigned int boost_count;
 };
 
 struct zz_dbs_tuners {
