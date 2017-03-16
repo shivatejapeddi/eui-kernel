@@ -301,7 +301,6 @@ config CPU_FREQ_GOV_ZZMOOVE
 
 	  if in doubt, say N.
 
-
 config CPU_FREQ_GOV_NIGHTMARE
 	tristate "'nightmare' cpufreq governor"
 	depends on CPU_FREQ
