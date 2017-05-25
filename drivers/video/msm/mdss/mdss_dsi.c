@@ -47,6 +47,12 @@ static struct mdss_dsi_data *mdss_dsi_res;
 static struct pm_qos_request mdss_dsi_pm_qos_request;
 
 static void mdss_dsi_pm_qos_add_request(void)
+
+#ifdef CONFIG_STATE_NOTIFIER
+#include <linux/state_notifier.h>
+#endif
+
+static void mdss_dsi_pm_qos_add_request(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 {
 	pr_debug("%s: add request", __func__);
 	pm_qos_add_request(&mdss_dsi_pm_qos_request, PM_QOS_CPU_DMA_LATENCY,
@@ -2416,6 +2422,10 @@ static int mdss_dsi_event_handler(struct mdss_panel_data *pdata,
 			rc = mdss_dsi_unblank(pdata);
 		pdata->panel_info.esd_rdy = true;
 		lcd_notifier_call_chain(LCD_EVENT_ON_END, NULL);
+#ifdef CONFIG_STATE_NOTIFIER
+		if (!use_fb_notifier)
+			state_resume();
+#endif
 		break;
 	case MDSS_EVENT_BLANK:
 		lcd_notifier_call_chain(LCD_EVENT_OFF_START, NULL);
@@ -2430,6 +2440,10 @@ static int mdss_dsi_event_handler(struct mdss_panel_data *pdata,
 			rc = mdss_dsi_blank(pdata, power_state);
 		rc = mdss_dsi_off(pdata, power_state);
 		lcd_notifier_call_chain(LCD_EVENT_OFF_END, NULL);
+#ifdef CONFIG_STATE_NOTIFIER
+		if (!use_fb_notifier)
+			state_suspend();
+#endif
 		break;
 	case MDSS_EVENT_CONT_SPLASH_FINISH:
 		if (ctrl_pdata->off_cmds.link_state == DSI_LP_MODE)
