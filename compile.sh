@@ -1,67 +1,9 @@
-#!/bin/bash
-#
-# Copyright - Ícaro Hoff <icarohoff@gmail.com>
-#
-#              \
-#              /\
-#             /  \
-#            /    \
-#
-SCRIPT_VERSION="3.5.1 (How Siegfried was Mourned and Buried)"
-
-# Colorize
-red='\033[01;31m'
-green='\033[01;32m'
-yellow='\033[01;33m'
-blue='\033[01;34m'
-blink_red='\033[05;31m'
-blink_green='\033[05;32m'
-blink_yellow='\033[05;33m'
-blink_blue='\033[05;34m'
-restore='\033[0m'
-
-# Cleaning
-clear
-
-# Naming
-NAME="Lambda"
-
-# Arguments
-FLAVOR=${1};
-
-# Flavor
-if [ "$FLAVOR" = mx ]; then
-	# Modular
-	FLAVOR="mx"
-	FNAME="MX"
-	FMODULE="yes"
-	ANYBRANCH="master"
-elif [ "$FLAVOR" = lx ]; then
-	# Built-in
-	FLAVOR="lx"
-	FNAME="LX"
-	FMODULE="no"
-	ANYBRANCH="alternative"
-else if [ "$FLAVOR" = perf ]; then
-	# Development
-	FLAVOR="perf"
-	FNAME="PERF"
-	FMODULE="yes"
-	ANYBRANCH="master"
-fi;
-fi;
-
-# Target
-TARGET="msm-${FLAVOR}"
-
-# Resources
-THREAD="-j$(grep -c ^processor /proc/cpuinfo)"
 
 # Variables
 export ARCH=arm64
 IMAGE=Image.gz-dtb
 MODIMAGE=modules.img
-DEFCONFIG=${TARGET}_defconfig
+DEFCONFIG=msm-perf_defconfig
 BUILD_DATE=$(date -u +%m%d%Y)
 
 # Paths
@@ -71,7 +13,7 @@ REPACK_FOLDER="$KERNEL_FOLDER/../anykernel"
 MODULES_FOLDER="$REPACK_FOLDER/modules-img"
 DATA_FOLDER="$REPACK_FOLDER/data"
 TEMP_FOLDER="$REPACK_FOLDER/temporary"
-TOOLCHAIN_FOLDER="$KERNEL_FOLDER/../toolchains"
+TOOLCHAIN_FOLDER=/home/shivapeddi_sp/kernel/aarch64-linux-android-4.9/bin/aarch64-linux-android-
 PRODUCT_FOLDER="$KERNEL_FOLDER/../products"
 
 # Functions
