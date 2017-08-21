@@ -765,10 +765,6 @@ config MSM_QBT1000
 	  This driver is used to enable clocks and marshal buffers for trusted
 	  applications running in the trusted execution environment.
 
-config STATE_NOTIFIER
-        bool "State Notifier"
-	default n
-
 source "drivers/soc/qcom/memshare/Kconfig"
 
 endif # ARCH_MSM
