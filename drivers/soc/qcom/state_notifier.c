@@ -110,8 +110,7 @@ void state_resume(void)
 {
 	dprintk("%s: resume called.\n", STATE_NOTIFIER);
 	flush_workqueue(susp_wq);
-	if (delayed_work_pending(&suspend_work))
-		cancel_delayed_work_sync(&suspend_work);
+	cancel_delayed_work_sync(&suspend_work);
 	suspend_in_progress = false;
 
 	if (state_suspended)
