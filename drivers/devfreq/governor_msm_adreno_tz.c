@@ -342,8 +342,6 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 	struct devfreq_msm_adreno_tz_data *priv = devfreq->data;
 	struct devfreq_dev_status stats;
 	int val, level = 0;
- HEAD
-	unsigned int scm_data[3];
 	unsigned int scm_data[4];
 	int context_count = 0;
 #if 1

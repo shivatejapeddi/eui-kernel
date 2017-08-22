@@ -46,8 +46,6 @@ static struct mdss_dsi_data *mdss_dsi_res;
 static struct pm_qos_request mdss_dsi_pm_qos_request;
 
 static void mdss_dsi_pm_qos_add_request(void)
-
-static void mdss_dsi_pm_qos_add_request(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 {
 	pr_debug("%s: add request", __func__);
 	pm_qos_add_request(&mdss_dsi_pm_qos_request, PM_QOS_CPU_DMA_LATENCY,

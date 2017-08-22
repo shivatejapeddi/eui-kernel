@@ -12,7 +12,7 @@ clear
 THREAD="-j$(grep -c ^processor /proc/cpuinfo)"
 KERNEL="Image.gz-dtb"
 DTBIMAGE="dtb"
-DEFCONFIG="msm-perf_defconfig"
+DEFCONFIG="lineage_x2_defconfig"
 KERNEL_DIR=`pwd`
 RESOURCE_DIR="$KERNEL_DIR/.."
 ANYKERNEL_DIR="${HOME}/anykernel"
