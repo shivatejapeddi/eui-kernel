@@ -28,8 +28,8 @@ export LOCALVERSION=-`echo $AMIGOS_VER`
 export CROSS_COMPILE="$TOOLCHAIN_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android-"
 export ARCH=arm64
 export SUBARCH=arm64
-export KBUILD_BUILD_USER=Dabug123
-export KBUILD_BUILD_HOST=Derpbox
+export KCFLAGS=-mno-android
+export KCFLAGS=-mno-android modules
 
 # Paths
 REPACK_DIR="$ANYKERNEL_DIR"
@@ -163,4 +163,3 @@ DATE_END=$(date +"%s")
 DIFF=$(($DATE_END - $DATE_START))
 echo "Time: $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds."
 echo
-
