@@ -71,22 +71,7 @@
 #define BLANK_FLAG_ULP	FB_BLANK_VSYNC_SUSPEND
 //#define MDSS_FB_SPEC_CAR_SEQ_CMDLINE_MAX 30
 
-
 char spec_char_seq[32];
-
-#define MDSS_FB_SPEC_CAR_SEQ_CMDLINE_MAX 30
-#define MDSS_FB_TURBO_OLED_FLIP_CHARGEMODE 30
-
-bool flip_chargermode_flag = false;
-char flip_chargermode[MDSS_FB_TURBO_OLED_FLIP_CHARGEMODE];
-char spec_char_seq[MDSS_FB_SPEC_CAR_SEQ_CMDLINE_MAX];
-
-#define MDSS_BRIGHT_TO_BL_DIM(out, v) do {\
-			out = (12*v*v+1393*v+3060)/4465;\
-			} while (0)
-bool backlight_dimmer = false;
-module_param(backlight_dimmer, bool, 0755);
-
 static struct fb_info *fbi_list[MAX_FBI_LIST];
 static int fbi_list_index;
 
@@ -279,14 +264,10 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 	if (value > mfd->panel_info->brightness_max)
 		value = mfd->panel_info->brightness_max;
 
-	if (backlight_dimmer) {
-		MDSS_BRIGHT_TO_BL_DIM(bl_lvl, value);
-	} else {
-		/* This maps android backlight level 0 to 255 into
-		   driver backlight level 0 to bl_max with rounding */
-		MDSS_BRIGHT_TO_BL(bl_lvl, value, mfd->panel_info->bl_max,
-					mfd->panel_info->brightness_max);
-	}
+	/* This maps android backlight level 0 to 255 into
+	   driver backlight level 0 to bl_max with rounding */
+	MDSS_BRIGHT_TO_BL(bl_lvl, value, mfd->panel_info->bl_max,
+				mfd->panel_info->brightness_max);
 
 	if (!bl_lvl && value)
 		bl_lvl = 1;
