@@ -36,7 +36,7 @@ REPACK_DIR="$ANYKERNEL_DIR"
 PATCH_DIR="$ANYKERNEL_DIR/patch"
 MODULES_DIR="$ANYKERNEL_DIR/modules"
 ZIP_MOVE="${HOME}/kernel/eui"
-ZIMAGE_DIR="${HOME}/kernel/eui/arch/arm64/boot"
+ZIMAGE_DIR="${HOME}/kernel/8996/arch/arm64/boot"
 
 # Functions
 function clean_all {
