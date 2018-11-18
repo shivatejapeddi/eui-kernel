@@ -196,4 +196,7 @@ source "drivers/firmware/Kconfig"
 
 source "drivers/bif/Kconfig"
 
+# Letv driver config
+source "drivers/letv/Kconfig"
+
 endmenu

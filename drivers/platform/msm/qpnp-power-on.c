@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012-2017, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -494,19 +494,6 @@ static ssize_t qpnp_pon_dbc_store(struct device *dev,
 	return size;
 }
 
-static struct qpnp_pon_config *
-qpnp_get_cfg(struct qpnp_pon *pon, u32 pon_type)
-{
-	int i;
-
-	for (i = 0; i < pon->num_pon_config; i++) {
-		if (pon_type == pon->pon_cfg[i].pon_type)
-			return  &pon->pon_cfg[i];
-	}
-
-	return NULL;
-}
-
 static DEVICE_ATTR(debounce_us, 0664, qpnp_pon_dbc_show, qpnp_pon_dbc_store);
 
 #define PON_TWM_ENTRY_PBS_BIT		BIT(0)
@@ -515,7 +502,6 @@ static int qpnp_pon_reset_config(struct qpnp_pon *pon,
 {
 	int rc;
 	u16 rst_en_reg;
-	struct qpnp_pon_config *cfg;
 
 	/* Ignore the PS_HOLD reset config if TWM ENTRY is enabled */
 	if (pon->support_twm_config && pon->twm_state == PMIC_TWM_ENABLE) {
@@ -526,18 +512,6 @@ static int qpnp_pon_reset_config(struct qpnp_pon *pon,
 							rc);
 			return rc;
 		}
-
-		cfg = qpnp_get_cfg(pon, PON_KPDPWR);
-		if (cfg) {
-			/* configure KPDPWR_S2 to Hard reset */
-			rc = qpnp_pon_masked_write(pon, cfg->s2_cntl_addr,
-						QPNP_PON_S2_CNTL_TYPE_MASK,
-						PON_POWER_OFF_HARD_RESET);
-			if (rc < 0)
-				pr_err("Unable to config KPDPWR_N S2 for hard-reset rc=%d\n",
-					rc);
-		}
-
 		pr_crit("PMIC configured for TWM entry\n");
 		return 0;
 	}
@@ -820,6 +794,19 @@ static int qpnp_pon_store_and_clear_warm_reset(struct qpnp_pon *pon)
 	}
 
 	return 0;
+}
+
+static struct qpnp_pon_config *
+qpnp_get_cfg(struct qpnp_pon *pon, u32 pon_type)
+{
+	int i;
+
+	for (i = 0; i < pon->num_pon_config; i++) {
+		if (pon_type == pon->pon_cfg[i].pon_type)
+			return  &pon->pon_cfg[i];
+	}
+
+	return NULL;
 }
 
 static int
@@ -2477,6 +2464,8 @@ static void __exit qpnp_pon_exit(void)
 	return spmi_driver_unregister(&qpnp_pon_driver);
 }
 module_exit(qpnp_pon_exit);
+
+#include "qpnp-power-on_letv.c"
 
 MODULE_DESCRIPTION("QPNP PMIC POWER-ON driver");
 MODULE_LICENSE("GPL v2");

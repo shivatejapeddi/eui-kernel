@@ -34,6 +34,7 @@
 #define INPUT_EVENT_HANDLER_DELAY_USECS (16000 * 4)
 #define AUTOREFRESH_MAX_FRAME_CNT 6
 
+static struct workqueue_struct *letv_pp_wq;
 static DEFINE_MUTEX(cmd_clk_mtx);
 
 static DEFINE_MUTEX(cmd_off_mtx);
@@ -297,7 +298,7 @@ static int mdss_mdp_cmd_tearcheck_cfg(struct mdss_mdp_mixer *mixer,
 	pr_debug("%s: yres=%d vclks=%x height=%d init=%d rd=%d start=%d wr=%d\n",
 		__func__, pinfo->yres, vclks_line, te->sync_cfg_height,
 		te->vsync_init_val, te->rd_ptr_irq, te->start_pos,
-		te->wr_ptr_irq);
+		te->wr_ptr_irq),
 	pr_debug("thrd_start =%d thrd_cont=%d pp_split=%d\n",
 		te->sync_threshold_start, te->sync_threshold_continue,
 		ctx->pingpong_split_slave);
@@ -1207,8 +1208,7 @@ static void mdss_mdp_cmd_pingpong_done(void *arg)
 		if (sync_ppdone) {
 			atomic_inc(&ctx->pp_done_cnt);
 			if (!ctl->commit_in_progress)
-				schedule_work(&ctx->pp_done_work);
-
+			queue_work(letv_pp_wq, &ctx->pp_done_work);
 			mdss_mdp_resource_control(ctl,
 				MDP_RSRC_CTL_EVENT_PP_DONE);
 		}
@@ -2655,7 +2655,7 @@ static void __mdss_mdp_kickoff(struct mdss_mdp_ctl *ctl,
 
 		MDSS_XLOG(0x11, ctx->autorefresh_frame_cnt,
 			ctx->autorefresh_state, is_pp_split);
-		ctx->autorefresh_state = MDP_AUTOREFRESH_ON;
+        	ctx->autorefresh_state = MDP_AUTOREFRESH_ON;
 
 	} else {
 		/* SW Kickoff */
@@ -3261,6 +3261,12 @@ static int mdss_mdp_cmd_ctx_setup(struct mdss_mdp_ctl *ctl,
 	ret = mdss_mdp_cmd_tearcheck_setup(ctx, false);
 	if (ret)
 		pr_err("tearcheck setup failed\n");
+
+	letv_pp_wq = alloc_workqueue("letv_pingpong_wq", WQ_UNBOUND | WQ_HIGHPRI, 0);
+	if (!letv_pp_wq) {
+		pr_err("fail to allocate letv_pingpong_wq");
+		return -ENOMEM;
+	}
 
 	return ret;
 }

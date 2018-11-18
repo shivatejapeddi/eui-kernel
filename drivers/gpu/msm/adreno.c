@@ -559,6 +559,7 @@ void adreno_irqctrl(struct adreno_device *adreno_dev, int state)
  */
 void adreno_hang_int_callback(struct adreno_device *adreno_dev, int bit)
 {
+
 	KGSL_DRV_CRIT_RATELIMIT(KGSL_DEVICE(adreno_dev),
 			"MISC: GPU hang detected\n");
 	adreno_irqctrl(adreno_dev, 0);

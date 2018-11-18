@@ -1218,7 +1218,6 @@ its demand *in reference to the power-efficient cpu* drops less than 60%
 
 
 *** 7.18 sched_small_wakee_task_load
-
 Appears at: /proc/sys/kernel/sched_small_wakee_task_load
 
 Default value: 10

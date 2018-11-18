@@ -72,7 +72,6 @@ MODULE_DESCRIPTION("USB Audio");
 MODULE_LICENSE("GPL");
 MODULE_SUPPORTED_DEVICE("{{Generic,USB Audio}}");
 
-
 static int index[SNDRV_CARDS] = SNDRV_DEFAULT_IDX;	/* Index 0-MAX */
 static char *id[SNDRV_CARDS] = SNDRV_DEFAULT_STR;	/* ID for this card */
 static bool enable[SNDRV_CARDS] = SNDRV_DEFAULT_ENABLE_PNP;/* Enable this card */
@@ -433,6 +432,7 @@ static int snd_usb_audio_create(struct usb_interface *intf,
 	strcpy(card->driver, "USB-Audio");
 	sprintf(component, "USB%04x:%04x",
 		USB_ID_VENDOR(chip->usb_id), USB_ID_PRODUCT(chip->usb_id));
+
 	snd_component_add(card, component);
 
 	/* retrieve the device string as shortname */
@@ -601,7 +601,7 @@ snd_usb_audio_probe(struct usb_device *dev,
 	chip->num_interfaces++;
 	chip->probing = 0;
 	intf->needs_remote_wakeup = 1;
-	mutex_unlock(&register_mutex);
+        mutex_unlock(&register_mutex);
 	return chip;
 
  __error:
@@ -697,10 +697,10 @@ int snd_usb_autoresume(struct snd_usb_audio *chip)
 	int err = -ENODEV;
 
 	down_read(&chip->shutdown_rwsem);
-	if (chip->probing || chip->in_pm)
-		err = 0;
-	else if (!chip->shutdown)
+	if (!chip->shutdown && !chip->probing && !chip->in_pm)
 		err = usb_autopm_get_interface(chip->pm_intf);
+	else
+		err = 0;
 	up_read(&chip->shutdown_rwsem);
 
 	return err;

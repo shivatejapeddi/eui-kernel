@@ -27,6 +27,7 @@
 #include <soc/qcom/ramdump.h>
 #include <linux/dma-mapping.h>
 #include <linux/of.h>
+#include "ssr_monitor.h"
 
 #define RAMDUMP_WAIT_MSECS	120000
 

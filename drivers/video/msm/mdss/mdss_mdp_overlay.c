@@ -48,6 +48,7 @@
 	((flags & MDSS_MDP_RIGHT_MIXER) || (dst_x >= left_lm_w))
 
 #define BUF_POOL_SIZE 32
+static struct workqueue_struct *letv_retire_wq;
 
 #define DFPS_DATA_MAX_HFP 8192
 #define DFPS_DATA_MAX_HBP 8192
@@ -6394,7 +6395,7 @@ static int __vsync_set_vsync_handler(struct msm_fb_data_type *mfd)
 	retire_cnt = mdp5_data->retire_cnt;
 	mutex_unlock(&mfd->mdp_sync_pt_data.sync_mutex);
 	if (!retire_cnt || mdp5_data->vsync_retire_handler.enabled)
-		return 0;
+              	return 0;
 
 	if (!ctl->ops.add_vsync_handler)
 		return -EOPNOTSUPP;
@@ -6547,6 +6548,12 @@ int mdss_mdp_overlay_init(struct msm_fb_data_type *mfd)
 	struct mdss_overlay_private *mdp5_data = NULL;
 	struct irq_info *mdss_irq;
 	int rc;
+
+	letv_retire_wq = alloc_workqueue("letv_retire_wq", WQ_UNBOUND | WQ_HIGHPRI, 0);
+	if (!letv_retire_wq) {
+		pr_err("fail to allocate letv_retire_wq");
+		return -ENOMEM;
+	}
 
 	mdp5_data = kzalloc(sizeof(struct mdss_overlay_private), GFP_KERNEL);
 	if (!mdp5_data) {

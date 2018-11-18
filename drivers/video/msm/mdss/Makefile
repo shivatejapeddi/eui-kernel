@@ -66,6 +66,9 @@ obj-$(CONFIG_FB_MSM_MDSS_HDMI_MHL_SII8334) += mhl_sii8334.o mhl_msc.o
 ccflags-y += -DTARGET_HW_MDSS_HDMI
 endif
 
+obj-$(CONFIG_FB_MSM_MDSS_HDMI_MHL_SII6400) += sii6400/
+obj-$(CONFIG_FB_MSM_MDSS_HDMI_DP_ANX7816) += dp/
+
 obj-$(CONFIG_FB_MSM_MDSS_WRITEBACK) += mdss_wb.o
 
 mdss-qpic-objs := mdss_qpic.o mdss_fb.o mdss_qpic_panel.o
