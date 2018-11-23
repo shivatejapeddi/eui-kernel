@@ -45,7 +45,6 @@
 #include <linux/kernel.h>
 #include <linux/bug.h>
 #include <linux/sched.h>
-#include <linux/panic_reason.h>
 
 extern const struct bug_entry __start___bug_table[], __stop___bug_table[];
 
@@ -172,7 +171,6 @@ enum bug_trap_type report_bug(unsigned long bugaddr, struct pt_regs *regs)
 		return BUG_TRAP_TYPE_WARN;
 	}
 
-	set_panic_trig_rsn(TRIG_KERNEL_BUG_MACRO);
 	printk(KERN_DEFAULT "------------[ cut here ]------------\n");
 	if (file)
 		pr_crit("kernel BUG at %s:%u!\n", file, line);

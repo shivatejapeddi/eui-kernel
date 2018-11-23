@@ -16,7 +16,6 @@
 #include <linux/syscalls.h>
 #include <linux/syscore_ops.h>
 #include <linux/uaccess.h>
-#include <linux/panic_reason.h>
 
 /*
  * this indicates whether you can reboot with ctrl-alt-del: the default is yes
@@ -217,7 +216,6 @@ void kernel_restart(char *cmd)
 	kernel_restart_prepare(cmd);
 	migrate_to_reboot_cpu();
 	syscore_shutdown();
-	set_panic_trig_rsn(TRIG_CMD_REBOOT);
 	if (!cmd)
 		pr_emerg("Restarting system\n");
 	else
@@ -263,7 +261,6 @@ void kernel_power_off(void)
 		pm_power_off_prepare();
 	migrate_to_reboot_cpu();
 	syscore_shutdown();
-	set_panic_trig_rsn(TRIG_CMD_POWEROFF);
 	pr_emerg("Power down\n");
 	kmsg_dump(KMSG_DUMP_POWEROFF);
 	machine_power_off();

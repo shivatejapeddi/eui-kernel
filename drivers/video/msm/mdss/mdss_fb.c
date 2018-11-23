@@ -24,6 +24,7 @@
 #include <linux/device.h>
 #include <linux/dma-mapping.h>
 #include <linux/dma-buf.h>
+#include <linux/leds.h>
 #include <linux/fb.h>
 #include <linux/init.h>
 #include <linux/ioport.h>

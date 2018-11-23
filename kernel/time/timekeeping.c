@@ -703,17 +703,12 @@ EXPORT_SYMBOL(do_gettimeofday);
  * Sets the time of day to the new time and update NTP and notify hrtimers
  */
 
-extern int utc_pm_mark_enabled;
 int do_settimeofday(const struct timespec *tv)
 {
 	struct timekeeper *tk = &tk_core.timekeeper;
 	struct timespec64 ts_delta, xt, tmp;
 	unsigned long flags;
 	int ret = 0;
-
-	if (! utc_pm_mark_enabled) {
-		do_prk_utc_cali(tv->tv_sec);
-	}
 
 	if (!timespec_valid_strict(tv))
 		return -EINVAL;

@@ -331,13 +331,9 @@
 			<0xff 132>, /* blsp1_qup_irq(5) */
 			<0xff 133>, /* blsp2_qup_irq(0) */
 			<0xff 134>, /* blsp2_qup_irq(1) */
-<<<<<<< HEAD
-			<0xff 135>, /* blsp2_qup_irq(2) */
-=======
 			<0xff 135>, /* temporary */
 			<0xff 136>, /* temporary */
 			<0xff 137>, /* temporary */
->>>>>>> 8343706... x2 : stock 16s EUI kernel
 			<0xff 138>, /* blsp2_qup_irq(5) */
 			<0xff 140>, /* blsp1_uart_irq(1) */
 			<0xff 146>, /* blsp2_uart_irq(1) */
